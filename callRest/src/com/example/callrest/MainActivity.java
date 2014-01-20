@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,9 +42,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// call AsynTask to perform network operation on separate thread
-		        new HttpAsyncTask().execute(
-		        		"http://146.185.181.29:8080/kitapyorum/services/sample/listJson");
-		    
+			/*	new HttpAsyncTask().execute(
+		        		"http://localhost:8080/booklet-ws/services/sample/listJson");
+		        		*/
+				new HttpAsyncTask().execute(
+		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");
 			}
 		});
 	}
@@ -74,6 +78,44 @@ public class MainActivity extends Activity {
         return result;
     }
 	
+	public static String POST(String url){
+        InputStream inputStream = null;
+        String result = "";
+        try {
+ 
+            // create HttpClient
+            HttpClient httpclient = new DefaultHttpClient();
+ 
+            // make GET request to the given URL
+            HttpPost post=new HttpPost(url);
+            post.setHeader("Accept", "application/json");
+            post.setHeader("Content-Type", "application/json");
+            
+            JSONObject jsonum=new JSONObject();
+            jsonum.put("sampleName", "gokman");
+            
+            
+            StringEntity sampleEntity=new StringEntity(jsonum.toString());
+            post.setEntity(sampleEntity);
+            
+            HttpResponse httpResponse = httpclient.execute(post);
+ 
+            // receive response as inputStream
+            inputStream = httpResponse.getEntity().getContent();
+ 
+            // convert inputstream to string
+            if(inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+ 
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+ 
+        return result;
+    }
+	
 	private static String convertInputStreamToString(InputStream inputStream) throws IOException{
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
         String line = "";
@@ -87,12 +129,14 @@ public class MainActivity extends Activity {
     }
 	
 	private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+		
         @Override
         protected String doInBackground(String... urls) {
  
-            return GET(urls[0]);
+            //return GET(urls[0]);
+        	return POST(urls[0]);
         }
-        // onPostExecute displays the results of the AsyncTask.
+        
         @Override
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
