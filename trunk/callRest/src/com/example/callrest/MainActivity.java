@@ -42,10 +42,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// call AsynTask to perform network operation on separate thread
-			/*	new HttpAsyncTask().execute(
-		        		"http://localhost:8080/booklet-ws/services/sample/listJson");
+			/*new HttpAsyncTask().execute(
+		        		"http://10.0.2.2:8080/booklet-ws/services/sample/listJson");
 		        		*/
-				new HttpAsyncTask().execute(
+				
+			  new HttpAsyncTask().execute(
 		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");
 			}
 		});
@@ -58,9 +59,14 @@ public class MainActivity extends Activity {
  
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
+            
+            // make GET request to the given URL
+            HttpGet get=new HttpGet(url);
+            get.setHeader("Accept", "application/json");
+            get.setHeader("Content-Type", "application/json");
  
             // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+            HttpResponse httpResponse = httpclient.execute(get);
  
             // receive response as inputStream
             inputStream = httpResponse.getEntity().getContent();
@@ -92,7 +98,7 @@ public class MainActivity extends Activity {
             post.setHeader("Content-Type", "application/json");
             
             JSONObject jsonum=new JSONObject();
-            jsonum.put("sampleName", "gokman");
+            jsonum.put("sampleName", "rerere");
             
             
             StringEntity sampleEntity=new StringEntity(jsonum.toString());
@@ -139,32 +145,60 @@ public class MainActivity extends Activity {
         
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-                
-            //convert to json
-            JSONArray jsonArray;
-            JSONObject jsonObject=null;
+        	//postExecuteForGet(result);
+        	postExecuteForPost(result);		
+       }
+    }
+	
+	public void postExecuteForGet(String result){
+		Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+        
+        //convert to json
+        JSONArray jsonArray;
+        JSONObject jsonObject=null;
+		try {
+			jsonArray=new JSONArray(result);
+			for(int i=0;i<jsonArray.length();i++){
+			    jsonObject=(JSONObject)jsonArray.get(i);
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 			try {
-				jsonArray=new JSONArray(result);
-				for(int i=0;i<jsonArray.length();i++){
-				    jsonObject=(JSONObject)jsonArray.get(i);
-				}
-				
+				textViewSampleId.setText(jsonObject.getString("sampleId"));
+				textViewSampleName.setText(jsonObject.getString("sampleName"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	}
+	
+	public void postExecuteForPost(String result){
+		Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+        
+        //convert to json
+        JSONObject jsonObject=null;
+		try {
 			
-				try {
-					textViewSampleId.setText(jsonObject.getString("sampleId"));
-					textViewSampleName.setText(jsonObject.getString("sampleName"));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-					
-       }
-    }
+			    jsonObject=new JSONObject(result);
+			
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+			try {
+				textViewSampleId.setText(jsonObject.getString("sampleId"));
+				textViewSampleName.setText(jsonObject.getString("sampleName"));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
