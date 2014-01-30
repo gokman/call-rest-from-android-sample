@@ -4,12 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.Principal;
 
+import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +25,7 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,12 +50,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// call AsynTask to perform network operation on separate thread
-			/*new HttpAsyncTask().execute(
+			new HttpAsyncTask().execute(
 		        		"http://10.0.2.2:8080/booklet-ws/services/sample/listJson");
-		        		*/
+		        		
 				
-			  new HttpAsyncTask().execute(
-		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");
+			/*  new HttpAsyncTask().execute(
+		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");*/
 			}
 		});
 	}
@@ -58,12 +66,18 @@ public class MainActivity extends Activity {
         try {
  
             // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
+            DefaultHttpClient httpclient = new DefaultHttpClient();
             
             // make GET request to the given URL
             HttpGet get=new HttpGet(url);
             get.setHeader("Accept", "application/json");
             get.setHeader("Content-Type", "application/json");
+            
+            //credentials
+            String credentials = "gokman" + ":" + "kocaman";  
+            String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+            get.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+            
  
             // make GET request to the given URL
             HttpResponse httpResponse = httpclient.execute(get);
@@ -91,7 +105,12 @@ public class MainActivity extends Activity {
  
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
- 
+            
+            //credentials
+            UsernamePasswordCredentials usernamePasswordCred=new UsernamePasswordCredentials(
+            		"gokman","kocaman");
+            ((AbstractHttpClient) httpclient).getCredentialsProvider()
+            .setCredentials(new AuthScope("10.0.2.2", 80, AuthScope.ANY_REALM), usernamePasswordCred);
             // make GET request to the given URL
             HttpPost post=new HttpPost(url);
             post.setHeader("Accept", "application/json");
@@ -139,14 +158,14 @@ public class MainActivity extends Activity {
         @Override
         protected String doInBackground(String... urls) {
  
-            //return GET(urls[0]);
-        	return POST(urls[0]);
+            return GET(urls[0]);
+        	//return POST(urls[0]);
         }
         
         @Override
         protected void onPostExecute(String result) {
-        	//postExecuteForGet(result);
-        	postExecuteForPost(result);		
+        	postExecuteForGet(result);
+        	//postExecuteForPost(result);		
        }
     }
 	
