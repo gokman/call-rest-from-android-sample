@@ -106,15 +106,16 @@ public class MainActivity extends Activity {
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
             
-            //credentials
-            UsernamePasswordCredentials usernamePasswordCred=new UsernamePasswordCredentials(
-            		"gokman","kocaman");
-            ((AbstractHttpClient) httpclient).getCredentialsProvider()
-            .setCredentials(new AuthScope("10.0.2.2", 80, AuthScope.ANY_REALM), usernamePasswordCred);
+            
             // make GET request to the given URL
             HttpPost post=new HttpPost(url);
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
+            
+            //credentials
+            String credentials = "gokman" + ":" + "kocaman";  
+            String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);  
+            post.addHeader("Authorization", "Basic " + base64EncodedCredentials);
             
             JSONObject jsonum=new JSONObject();
             jsonum.put("sampleName", "rerere");
