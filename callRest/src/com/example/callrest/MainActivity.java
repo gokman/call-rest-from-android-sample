@@ -50,12 +50,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// call AsynTask to perform network operation on separate thread
-			new HttpAsyncTask().execute(
+			/*new HttpAsyncTask().execute(
 		        		"http://10.0.2.2:8080/booklet-ws/services/sample/listJson");
-		        		
+		      */  		
 				
-			/*  new HttpAsyncTask().execute(
-		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");*/
+			new HttpAsyncTask().execute(
+		        		"http://10.0.2.2:8080/booklet-ws/services/sample/addSample");
 			}
 		});
 	}
@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
             post.addHeader("Authorization", "Basic " + base64EncodedCredentials);
             
             JSONObject jsonum=new JSONObject();
-            jsonum.put("sampleName", "rerere");
+            jsonum.put("sampleName", "rarababacaca");
             
             
             StringEntity sampleEntity=new StringEntity(jsonum.toString());
@@ -159,14 +159,14 @@ public class MainActivity extends Activity {
         @Override
         protected String doInBackground(String... urls) {
  
-            return GET(urls[0]);
-        	//return POST(urls[0]);
+            //return GET(urls[0]);
+        	return POST(urls[0]);
         }
         
         @Override
         protected void onPostExecute(String result) {
-        	postExecuteForGet(result);
-        	//postExecuteForPost(result);		
+        	//postExecuteForGet(result);
+        	postExecuteForPost(result);		
        }
     }
 	
