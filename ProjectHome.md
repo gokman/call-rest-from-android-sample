@@ -1,0 +1,1 @@
+project is about calling rest service from android project sample code.
